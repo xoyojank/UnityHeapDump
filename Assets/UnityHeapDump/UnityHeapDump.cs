@@ -33,7 +33,7 @@ public class UnityHeapDump
 		Directory.CreateDirectory("dump/uobjects");
 		Directory.CreateDirectory("dump/statics");
 
-		using (var logger = new StreamWriter("dump/log.txt"))
+		using (var logger = new StreamWriter("dump/memory.csv"))
 		{
 			Dictionary<Assembly, List<StructOrClass>> assemblyResults = new Dictionary<Assembly, List<StructOrClass>>();
 			Dictionary<Assembly, int> assemblySizes = new Dictionary<Assembly, int>();
@@ -138,7 +138,7 @@ public class UnityHeapDump
 			int unityScriptableObjectsSize = unityScriptableObjects.Sum(a => a.Size);
 			bool printedUnityScriptableObjects = false;
 
-			logger.WriteLine("Total tracked memory (including duplicates, so too high) = {0}", assemblySizesList.Sum(a => a.Value) + unityComponentsSize + unityScriptableObjectsSize);
+			//logger.WriteLine("Total tracked memory (including duplicates, so too high) = {0}", assemblySizesList.Sum(a => a.Value) + unityComponentsSize + unityScriptableObjectsSize);
 
 
 			foreach (var pair in assemblySizesList)
@@ -149,12 +149,12 @@ public class UnityHeapDump
 				if (!printedUnityComponents && size < unityComponentsSize)
 				{
 					printedUnityComponents = true;
-					logger.WriteLine("Unity components of total size: {0}", unityComponentsSize);
+					//logger.WriteLine("Unity components of total size: {0}", unityComponentsSize);
 					foreach (var instance in unityComponents)
 					{
 						if (instance.Size >= TYPE_MIN_SIZE_TO_PRINT)
 						{
-							logger.WriteLine("    Type {0} (ID: {1}) of size {2}", instance.ParsedType.FullName, instance.InstanceID, instance.Size);
+							logger.WriteLine("\"{0}\",\"{1}\",{2},{3}", "Unity Components", instance.ParsedType.FullName, instance.InstanceID, instance.Size);
 						}
 					}
 				}
@@ -162,28 +162,28 @@ public class UnityHeapDump
 				if (!printedUnityScriptableObjects && size < unityScriptableObjectsSize)
 				{
 					printedUnityScriptableObjects = true;
-					logger.WriteLine("Unity scriptableobjects of total size: {0}", unityScriptableObjectsSize);
+					//logger.WriteLine("Unity scriptableobjects of total size: {0}", unityScriptableObjectsSize);
 					foreach (var instance in unityScriptableObjects)
 					{
 						if (instance.Size >= TYPE_MIN_SIZE_TO_PRINT)
 						{
-							logger.WriteLine("    Type {0} (ID: {1}) of size {2}", instance.ParsedType.FullName, instance.InstanceID, instance.Size);
+							logger.WriteLine("\"{0}\",\"{1}\",{2},{3}", "Unity ScriptableObjects", instance.ParsedType.FullName, instance.InstanceID, instance.Size);
 						}
 					}
 				}
 
-				logger.WriteLine("Assembly: {0} of total size: {1}", assembly, size);
+				//logger.WriteLine("Assembly: {0} of total size: {1}", assembly, size);
 				foreach (var type in assemblyResults[assembly])
 				{
 					if (type.Size >= TYPE_MIN_SIZE_TO_PRINT)
 					{
-						logger.WriteLine("    Type: {0} of size {1}", type.ParsedType.FullName, type.Size);
+						logger.WriteLine("\"{0}\",\"{1}\",,{2}", assembly, type.ParsedType.FullName, type.Size);
 					}
 				}
 			}
 			foreach (var error in parseErrors)
 			{
-				logger.WriteLine(error);
+				//logger.WriteLine(error);
 			}
 		}
 
